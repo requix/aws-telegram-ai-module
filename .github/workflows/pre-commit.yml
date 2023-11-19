@@ -1,0 +1,39 @@
+name: Terraform and Python Linting
+
+on: workflow_dispatch
+
+jobs:
+  terraform-and-python-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.2
+
+      - name: Initialize and Validate Terraform
+        id: init
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Setup tflint
+        uses: terraform-linters/setup-tflint@v3
+        with:
+          tflint_version: v0.49.0
+
+      - name: Run tflint
+        id: tflint
+        run: |
+          tflint --init
+          tflint -f compact
+
+      - name: Scan with Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12.1347.0
+        with:
+          directory: terraform
+          framework: terraform
