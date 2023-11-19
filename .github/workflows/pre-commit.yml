@@ -17,6 +17,7 @@ jobs:
       - name: Initialize and Validate Terraform
         id: init
         run: |
+          cd terraform
           terraform init -backend=false
           terraform validate
 
@@ -29,7 +30,7 @@ jobs:
         id: tflint
         run: |
           tflint --init
-          tflint -f compact
+          tflint -f compact --chdir=terraform
 
       - name: Scan with Checkov
         id: checkov
