@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ./src/lambda/message-processing
     steps:
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
