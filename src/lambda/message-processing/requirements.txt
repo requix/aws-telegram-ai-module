@@ -1,0 +1,6 @@
+boto3
+pyTelegramBotAPI
+openai
+requests
+urllib3<2
+pydantic==1.*
