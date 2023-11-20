@@ -2,38 +2,62 @@ name: Terraform and Python Linting
 
 on: workflow_dispatch
 
+env:
+  TERRAFORM_VERSION: 1.5.2
+  TFLINT_VERSION: v0.49.0
+
 jobs:
-  terraform-and-python-lint:
+  terraform-lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
-
+        uses: actions/checkout@v3
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.2
-
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
       - name: Initialize and Validate Terraform
         id: init
         run: |
           terraform init -backend=false
           terraform validate
-
       - name: Setup tflint
         uses: terraform-linters/setup-tflint@v3
         with:
-          tflint_version: v0.49.0
-
+          tflint_version: ${{ env.TFLINT_VERSION }}
       - name: Run tflint
         id: tflint
         run: |
           tflint --init
           tflint -f compact
-
       - name: Scan with Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@v12.1347.0
         with:
-          directory: terraform
+          directory: .
           framework: terraform
+
+  python-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/lambda/message-processing
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint flake8
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Run pylint
+        run: find . -name '*.py' -exec pylint {} +
+      - name: Run flake8
+        run: find . -name '*.py' -exec flake8 {} +
