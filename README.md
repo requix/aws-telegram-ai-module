@@ -5,6 +5,12 @@
 
 The AWS Telegram AI Module is a project designed to seamlessly integrate an AI assistant with a Telegram chatbot. Utilizing the capabilities of the new OpenAI API, this project enables users to interact with an advanced AI model directly through Telegram. The module is particularly useful for creating specialized assistants, such as a math tutor, language teacher, or general-purpose chatbot.
 
+## Architecture Diagram
+
+Below is a diagram illustrating the overall architecture:
+
+![Architecture Diagram](./images/infra-diagram.png)
+
 ## Requirements
 
 - AWS Account
