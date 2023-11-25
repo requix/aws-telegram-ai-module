@@ -11,7 +11,7 @@ module "lambda_function" {
 
   publish = true
 
-  source_path = "${path.module}/src/lambda/message-processing"
+  source_path = "${path.module}/src/lambda/message-processing/"
 
   event_source_mapping = {
     sqs = {

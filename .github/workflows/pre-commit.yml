@@ -1,10 +1,16 @@
 name: Terraform and Python Linting
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 env:
   TERRAFORM_VERSION: 1.5.2
   TFLINT_VERSION: v0.49.0
+
+permissions: read-all
 
 jobs:
   terraform-lint:
@@ -44,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src/lambda/message-processing
+        working-directory: ./terraform/src/lambda/message-processing
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3

@@ -1,9 +1,7 @@
 resource "aws_dynamodb_table" "assistant" {
-  name           = "${var.app_name}-assistant"
-  billing_mode   = "PAY_PER_REQUEST"
-  read_capacity  = 5
-  write_capacity = 5
-  hash_key       = "assistant_id"
+  name         = "${var.app_name}-assistant"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "assistant_id"
 
   attribute {
     name = "assistant_id"
@@ -22,12 +20,10 @@ resource "aws_dynamodb_table" "assistant" {
 
 
 resource "aws_dynamodb_table" "threads" {
-  name           = "${var.app_name}-threads"
-  billing_mode   = "PAY_PER_REQUEST"
-  read_capacity  = 5
-  write_capacity = 5
-  hash_key       = "chat_id"
-  range_key      = "thread_id"
+  name         = "${var.app_name}-threads"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "chat_id"
+  range_key    = "thread_id"
 
   attribute {
     name = "chat_id"
