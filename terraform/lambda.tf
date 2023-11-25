@@ -64,6 +64,15 @@ module "lambda_function" {
       resources = [
         "*"
       ]
+    },
+    kms = {
+      effect = "Allow",
+      actions = [
+        "kms:Decrypt"
+      ],
+      resources = [
+        aws_kms_key.dynamo-encryption-key.arn
+      ]
     }
   }
 

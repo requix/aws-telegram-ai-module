@@ -24,41 +24,7 @@ Below is a diagram illustrating the overall architecture:
    - Ensure you have an active AWS account.
    - Configure AWS CLI with your credentials.
 
-2. **Telegram Bot Setup:**
-   - Create a new bot on Telegram via BotFather.
-   - Note down the generated Bot Token.
-
-3. **OpenAI API Key:**
-   - Obtain an API key from OpenAI by creating an account and following their access guidelines.
-
-4. **Local Environment Setup:**
-   - Install Terraform on your local machine.
-   - Clone the repository: `git clone https://github.com/requix/aws-telegram-ai-module`
-
-5. **Terraform Initialization:**
-   - Navigate to the cloned directory.
-   - Run `terraform init` to initialize Terraform.
-
-6. **Terraform Apply:**
-   - Modify the `terraform.tfvars` file with your specific configuration (Bot Token, OpenAI API Key, etc.).
-   - Execute `terraform apply` to deploy the module to your AWS account.
-
-## Usage Guide
-
-Once deployed, you can interact with your AI assistant via the Telegram bot. Customize the assistant's behavior by modifying the parameters in the Terraform configuration file.
-
-### Interacting with the Bot
-- Start a conversation with your Telegram bot.
-- Type your queries or commands.
-- The AI assistant will respond based on its configured capabilities.
-
-### Modifying Assistant Behavior
-- Edit the `terraform.tfvars` file to change the assistant's characteristics.
-- Re-run `terraform apply` to update the deployment.
-
-## Example
-
-Here's an example configuration for setting up a math assistant:
+2. **Deploy Terraform Module:**
 
 ```hcl
 module "math_assistant" {
@@ -71,5 +37,49 @@ module "math_assistant" {
   assistant_model = "gpt-4-1106-preview"
 }
 ```
-
 In this configuration, a Telegram bot named "Math Tutor" is set up, limited to specific user IDs, and utilizes the GPT-4 model to assist with math-related queries.
+
+   - Note down Apigateway Endpoint from the terraform output
+
+3. **Telegram Bot Setup:**
+   - Create a new bot on Telegram via BotFather.
+   - Note down the generated Bot Token.
+
+4. **Set Telegram Webhook:**
+   - Use Telegram Bot Token and Apigateway Endpoint from the previous steps
+
+```bash
+#!/bin/bash
+
+TELEGRAM_API_TOKEN="1234567890:VVFtDfJj9ks7lZwYeAe12l_DiCys-2gmxra"
+APIGATEWAY_ENDPOINT="https://12345abcde.execute-api.eu-central-1.amazonaws.com"
+
+curl -X "POST" "https://api.telegram.org/bot$TELEGRAM_API_TOKEN/setWebhook" \
+    -d "{\"url\": \"$APIGATEWAY_ENDPOINT\"}" \
+    -H "Content-Type: application/json; charset=utf-8"
+```
+
+3. **OpenAI API Key:**
+   - Obtain an API key from OpenAI by creating an account and following their access guidelines.
+
+4. **Update SSM parameter with actual Telegram API Key:**
+   - Open AWS Console -> System Manager -> Parameter Store.
+   - Find `{app_name}-bot-token` -> Edit -> Change Value -> Save changes
+
+5. **Update SSM parameter with actual OpenAI API Key:**
+   - Open AWS Console -> System Manager -> Parameter Store.
+   - Find `{app_name}-openai-token` -> Edit -> Change Value -> Save changes
+
+
+## Usage Guide
+
+Once deployed, you can interact with your AI assistant via the Telegram bot. Customize the assistant's behavior by modifying the parameters in the Terraform configuration file.
+
+### Interacting with the Bot
+- Start a conversation with your Telegram bot.
+- Type your queries or commands.
+- The AI assistant will respond based on its configured capabilities.
+
+### Modifying Assistant Behavior
+- Edit the module input variables to change the assistant's characteristics.
+- Re-run `terraform apply` to update the deployment.
