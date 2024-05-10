@@ -14,6 +14,7 @@ conversation flows with OpenAI API.
 import json
 import logging
 import os
+from aws_lambda_powertools import Tracer, Metrics, Logger
 
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -21,8 +22,10 @@ from botocore.exceptions import ClientError
 import telebot
 from openai import OpenAI
 
-logger = telebot.logger
-telebot.logger.setLevel(logging.INFO)
+
+tracer = Tracer()
+metrics = Metrics()
+logger = Logger()
 
 ssm = boto3.client('ssm')
 
@@ -51,22 +54,36 @@ THREADS_TABLE_NAME = os.getenv('threads_table_name')
 threads_table = dynamodb_resource.Table(THREADS_TABLE_NAME)
 
 
+@tracer.capture_lambda_handler
+@metrics.log_metrics
+@logger.inject_lambda_context
 def handler(event, _context):
-    """Handle incoming events and process them."""
+    """
+    This is the main handler function that will be invoked by AWS Lambda.
+    """
     process_event(event)
-    return {'statusCode': 200}
+    return {
+        "statusCode": 200,
+        "body": "Event processed successfully!"
+    }
 
 
+@tracer.capture_method(capture_response=False)
 def process_event(event):
-    """Parse the event and process it using the bot's update handler."""
+    """
+    Parse the event and process it using the bot's update handler.
+    """
     logger.info("Event: %s", event)
     request_body_dict = json.loads(event['Records'][0]['body'])
     update = telebot.types.Update.de_json(request_body_dict)
     bot.process_new_updates([update])
 
 
+@tracer.capture_method(capture_response=False)
 def escape_markdown(string: str) -> str:
-    """Escape markdown characters in a string to prevent formatting issues."""
+    """
+    Escape markdown characters in a string to prevent formatting issues.
+    """
     escape_chars = [
         "_", "*", "[", "]", "(", ")", "~", ">", "#",
         "+", "-", "=", "|", "{", "}", ".", "!", ","
@@ -76,9 +93,11 @@ def escape_markdown(string: str) -> str:
     return string
 
 
+@tracer.capture_method(capture_response=False)
 def ask_openai_threads(chat_id, question):
-    """Send a question to OpenAI and return the response
-    for the specified chat ID."""
+    """
+    Send a question to OpenAI and return the response for the specified chat_id
+    """
     try:
         assistant_id = get_stored_assistant_id()
         if not assistant_id:
@@ -119,9 +138,12 @@ def ask_openai_threads(chat_id, question):
         return "Error with the client request. Please try again later."
 
 
+@tracer.capture_method(capture_response=False)
 @bot.message_handler(func=lambda message: message.chat.id not in ALLOWED_USERS)
 def decline_strangers(message):
-    """Reply to unauthorized users who try to use the bot."""
+    """
+    Reply to unauthorized users who try to use the bot.
+    """
     response_message = (
         f"You are not allowed to use this bot\n"
         f"Ask admin to add your user id: {message.chat.id}"
@@ -129,16 +151,22 @@ def decline_strangers(message):
     bot.reply_to(message, response_message)
 
 
+@tracer.capture_method(capture_response=False)
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
-    """Send a welcome message in response to 'help' or 'start' commands."""
+    """
+    Send a welcome message in response to 'help' or 'start' commands.
+    """
     bot.reply_to(message, ("Hi there, I am EchoBot.\n"
                            "I am here to echo your kind words back to you."))
 
 
+@tracer.capture_method(capture_response=False)
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def echo_message(message):
-    """Process and respond to user messages using OpenAI threads."""
+    """
+    Process and respond to user messages using OpenAI threads.
+    """
     user_input = message.text.strip()
     bot.send_chat_action(chat_id=message.chat.id, action="typing")
 
@@ -151,8 +179,11 @@ def echo_message(message):
     )
 
 
+@tracer.capture_method(capture_response=False)
 def create_assistant():
-    """Create an Assistant with the beta endpoint"""
+    """
+    Create an Assistant with the beta endpoint
+    """
     try:
         assistant_tools = []
         assistant_name = os.getenv('assistant_name')
@@ -174,8 +205,11 @@ def create_assistant():
         raise
 
 
+@tracer.capture_method(capture_response=False)
 def save_assistant(assistant_id):
-    """Save assistant_id to the DynamoDB table"""
+    """
+    Save assistant_id to the DynamoDB table
+    """
     try:
         response = dynamodb_client.put_item(
             TableName=ASSISTANT_TABLE_NAME,
@@ -187,8 +221,11 @@ def save_assistant(assistant_id):
         raise
 
 
+@tracer.capture_method(capture_response=False)
 def get_stored_assistant_id():
-    """Get stored assistant_id."""
+    """
+    Get stored assistant_id.
+    """
     try:
         response = assistant_table.scan()
         logger.info("Stored Assistant: %s", response)
@@ -203,8 +240,11 @@ def get_stored_assistant_id():
         raise
 
 
+@tracer.capture_method(capture_response=False)
 def save_thread(chat_id, thread_id, thread_name):
-    """Save thread_id to the DynamoDB table"""
+    """
+    Save thread_id to the DynamoDB table.
+    """
     try:
         response = dynamodb_client.put_item(
             TableName=THREADS_TABLE_NAME,
@@ -221,8 +261,11 @@ def save_thread(chat_id, thread_id, thread_name):
         raise
 
 
+@tracer.capture_method(capture_response=False)
 def get_stored_thread_id(chat_id):
-    """Get stored thread_id for the current chat"""
+    """
+    Get stored thread_id for the current chat.
+    """
     try:
         response = threads_table.query(
             IndexName='UserStatusIndex',
