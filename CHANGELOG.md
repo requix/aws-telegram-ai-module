@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/requix/aws-telegram-ai-module/compare/v1.0.2...v1.1.0) (2024-05-10)
+
+
+### Features
+
+* Lambda upgade ([#11](https://github.com/requix/aws-telegram-ai-module/issues/11)) ([3c90377](https://github.com/requix/aws-telegram-ai-module/commit/3c903776c0fa88a4b9ec1fb5007802b20d22ffa0))
+
 ### [1.0.2](https://github.com/requix/aws-telegram-ai-module/compare/v1.0.1...v1.0.2) (2024-05-10)
 
 
