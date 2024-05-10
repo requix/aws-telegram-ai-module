@@ -1,12 +1,12 @@
 module "lambda_function" {
   #checkov:skip=CKV_TF_1
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 5.0"
+  version = "~> 7.0"
 
   function_name = "${var.app_name}-messages-processing"
   description   = "This function performs processing inbound and outbound messages for telegram bot"
   handler       = "index.handler"
-  runtime       = "python3.10"
+  runtime       = "python3.12"
   timeout       = 60
 
   publish = true
