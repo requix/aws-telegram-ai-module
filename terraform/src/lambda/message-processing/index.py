@@ -57,7 +57,7 @@ threads_table = dynamodb_resource.Table(THREADS_TABLE_NAME)
 @tracer.capture_lambda_handler
 @metrics.log_metrics
 @logger.inject_lambda_context
-def handler(event, context):
+def handler(event, _context):
     """
     This is the main handler function that will be invoked by AWS Lambda.
     """
