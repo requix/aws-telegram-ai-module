@@ -1,3 +1,5 @@
+aws-lambda-powertools
+aws_xray_sdk
 boto3
 pyTelegramBotAPI
 openai
