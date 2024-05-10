@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.0.2](https://github.com/requix/aws-telegram-ai-module/compare/v1.0.1...v1.0.2) (2024-05-10)
+
+
+### Reverts
+
+* Revert "Lambda upgrade (#9)" (#10) ([0a6adfb](https://github.com/requix/aws-telegram-ai-module/commit/0a6adfb8aaf894795e2c2525c07923f9bcebc6b9)), closes [#9](https://github.com/requix/aws-telegram-ai-module/issues/9) [#10](https://github.com/requix/aws-telegram-ai-module/issues/10)
+
 ### [1.0.1](https://github.com/requix/aws-telegram-ai-module/compare/v1.0.0...v1.0.1) (2023-11-25)
 
 
